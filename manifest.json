@@ -2,7 +2,7 @@
    "name": "Prime Time",
    "version": "1.0",
    "description": "Watch Amazon Prime Video with your friends!",
-   "permissions": ["activeTab","declarativeContent","storage"],
+   "permissions": ["activeTab","declarativeContent"],
    "background": {
      "scripts": ["background.js"],
      "persistent": false

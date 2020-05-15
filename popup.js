@@ -1,19 +1,29 @@
-// grab the button from popup.html 
-let changeColor = document.getElementById('changeColor');
-// request the color value from storage and set it as the background of the button
-chrome.storage.sync.get('color', function(data) {
-   changeColor.style.backgroundColor = data.color;
-   changeColor.setAttribute('value', data.color);
-});
-// adds an onclick event the button, which triggers a programatically injected content script
-// this script turns the background color of the page the same color as the button
-// note: the tabs API must be registered under the "permissions" field in the manifest
-changeColor.onclick = function(element) {
-   let color = element.target.value;
+// grab the create room button from popup.html 
+let createRoomButton = document.getElementById('create-room');
+// add onclick listener to the create room button
+createRoomButton.onclick = function(element) {
+   // get the current tab
    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      // programmatically inject content script into tab
       chrome.tabs.executeScript(
          tabs[0].id,
-         {file: 'contentScript.js'}
+         {file: 'contentScript.js'},
+         function() {
+            // check if injection was successful
+            if(chrome.runtime.lastError) {
+               // if not, throw error
+               console.error(chrome.runtime.lastError);
+               throw Error("Unable to inject script into tab ");
+            }
+            // if yes, sendMessage to the content script
+            chrome.tabs.sendMessage(
+               tabs[0].id, 
+               {type: "create-room"}, 
+               function(response) {
+                  console.log(response.confirmation);
+               }
+            )
+         }
       );
    });
 };
